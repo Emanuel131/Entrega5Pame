@@ -5,6 +5,10 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     @staticmethod
+    def delete(obj):
+        db.session.delete(obj)
+        db.session.commit()
+    
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -12,9 +16,6 @@ class BaseModel(db.Model):
     def update(self):
         db.session.commit()
 
-    def delete(obj):
-        db.session.delete(obj)
-        db.session.commit()
 
 
 # Classe para ser herdada por Employee e Costumer

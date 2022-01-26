@@ -8,7 +8,7 @@ class Product(BaseModel):
     name = db.Column(db.String)
     quantity = db.Column(db.Float)
     description = db.Column(db.String)
-    lastModifiedBy = db.Column(db.String)
+    lastModifiedByCpf = db.Column(db.String)
     
 
     def json(self):
@@ -16,6 +16,7 @@ class Product(BaseModel):
             "id":self.id,
             "name":self.name,
             "quantity":self.quantity,
-            "description":self.description
+            "description":self.description,
+            "lastModifiedByCpf":self.lastModifiedByCpf
         }
     

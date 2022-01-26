@@ -18,8 +18,8 @@ class CostumerMethods(MethodView):
             return {"code_status":"invalid data"}, 400
         
         # Verifica se CPF tem tamanho valido
-        elif cpf < 11:
-            return {"code_status":"invalid data"}, 400
+        if len(str(cpf)) < 11:
+            return {"code_status":"invalid cpf format"}, 400
 
         # Verifica se cliente ja cadastrado
         costumer = Costumer.query.filter_by(cpf=cpf).first()
@@ -72,6 +72,7 @@ class CostumerMethodsId(MethodView):
         costumer.birthdate = birthdate
         costumer.cpf = cpf
         costumer.phone_number = phone_number
+        costumer.update()
 
         return costumer.json(), 200
 
@@ -84,14 +85,14 @@ class CostumerMethodsId(MethodView):
         return {"code_status":"deleted"}, 200
 
 
-# Cliente marcar horario
-class CostumerMethodsScheduleCpf(MethodView):
+# Cliente marcar horario:    /costumer/schedule/<int:id>
+class CostumerMethodsScheduleId(MethodView):
 
     # Altera informacoes do cliente
-    def patch(self, cpf):
+    def patch(self, id):
         body = request.json
 
-        costumer = Costumer.query.get_or_404(cpf)
+        costumer = Costumer.query.get_or_404(id)
 
         init_time_scheduled = body.get("init_time_scheduled")
         final_time_scheduled = body.get("final_time_scheduled")
@@ -102,5 +103,6 @@ class CostumerMethodsScheduleCpf(MethodView):
         
         costumer.init_time_scheduled = init_time_scheduled
         costumer.final_time_scheduled = final_time_scheduled
+        costumer.update()
 
         return costumer.json(), 200

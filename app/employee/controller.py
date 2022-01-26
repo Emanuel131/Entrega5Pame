@@ -18,8 +18,8 @@ class EmployeeMethods(MethodView):
             return {"code_status":"invalid data"}, 400
         
         # Verifica se CPF tem tamanho valido
-        elif cpf < 11:
-            return {"code_status":"invalid data"}, 400
+        elif len(str(cpf)) < 11:
+            return {"code_status":"invalid cpf format"}, 400
 
         # Verifica se cliente ja cadastrado
         employee = Employee.query.filter_by(cpf=cpf).first()
@@ -29,6 +29,7 @@ class EmployeeMethods(MethodView):
         # Caso nao seja, salva no banco de dados e retorna sucesso
         employee = Employee(name=name, birthdate=birthdate, cpf=cpf, phone_number=phone_number)
         employee.save()
+
         return employee.json(), 200
 
 
@@ -72,6 +73,7 @@ class EmployeeMethodsId(MethodView):
         employee.birthdate = birthdate
         employee.cpf = cpf
         employee.phone_number = phone_number
+        employee.update()
 
         return employee.json(), 200
 
