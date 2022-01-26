@@ -2,11 +2,11 @@ from app.product.models import Product
 from app.employee.models import Employee
 from app.extensions import request, MethodView
 
+# Autorizado cadastra/visualiza produto
 # /product/<int:id_employee>
-# Recebe id do empregado para autorização
-class ProductMethodsCpf(MethodView): 
+class ProductMethodsId(MethodView): 
 
-    # Insere info no banco de dados
+    # Cria novo produto
     def post(self, id):
         body = request.json
 
@@ -15,19 +15,20 @@ class ProductMethodsCpf(MethodView):
         name = body.get("name")
         quantity = body.get("quantity")
         description = body.get("description")
+        valid_through = body.get("valid_through")
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(quantity, float) or not isinstance(description, str):
+        if not isinstance(name, str) or not isinstance(quantity, float) or not isinstance(description, str) or not isinstance(valid_through, str):
             return {"code_status":"invalid data"}, 400
         
         # Caso nao seja, salva no banco de dados e retorna sucesso
-        product = Product(name=name, quantity=quantity, description=description, lastModifiedByCpf=employee.cpf)
+        product = Product(name=name, quantity=quantity, description=description, valid_through=valid_through, lastModifiedByCpf=employee.cpf)
         product.save()
 
         return product.json(), 200
 
 
-    # Retorna info do banco de dados
+    # Retorna info de produtos
     def get(self, id):
         Employee.query.get_or_404(id)
 
@@ -41,9 +42,9 @@ class ProductMethodsCpf(MethodView):
 
 
 
+# Autorizado escolhe produto especifico para mostrar/alterar/deletar
 # /product/<int:id>/<int:id>
-# Autoriza e escolhe produto especifico para mostrar
-class ProductMethodsId(MethodView):
+class ProductMethodsId2(MethodView):
 
     # Retorna info do banco de dados de id especifico
     def get(self, id_product, id_employee):
@@ -59,17 +60,19 @@ class ProductMethodsId(MethodView):
         product = Product.query.get_or_404(id_product)
         employee = Employee.query.get_or_404(id_employee)
 
-        name = body.get("name")
-        quantity = body.get("quantity")
-        description = body.get("description")
+        name = body.get("name", product.name)
+        quantity = body.get("quantity", product.quantity)
+        description = body.get("description", product.description)
+        valid_through = body.get("valid_through", product.valid_through)
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(quantity, float) or not isinstance(description, str):
+        if not isinstance(name, str) or not isinstance(quantity, float) or not isinstance(description, str) or not isinstance(valid_through, str):
             return {"code_status":"invalid data"}, 400
         
         product.name = name
         product.quantity = quantity
         product.description = description
+        product.valid_through = valid_through
         product.lastModifiedBy = employee.cpf
         product.update()
 

@@ -4,7 +4,7 @@ from app.extensions import request, MethodView
 # /costumer
 class CostumerMethods(MethodView):
 
-    # Insere info no banco de dados
+    # Cadastra novo cliente
     def post(self):
         body = request.json
 
@@ -14,11 +14,11 @@ class CostumerMethods(MethodView):
         phone_number = body.get("phone_number")
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, int) or not isinstance(phone_number, str):
+        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not isinstance(phone_number, str):
             return {"code_status":"invalid data"}, 400
         
         # Verifica se CPF tem tamanho valido
-        if len(str(cpf)) < 11:
+        if len(str(cpf)) != 11:
             return {"code_status":"invalid cpf format"}, 400
 
         # Verifica se cliente ja cadastrado
@@ -59,13 +59,13 @@ class CostumerMethodsId(MethodView):
 
         costumer = Costumer.query.get_or_404(id)
 
-        name = body.get("name")
-        birthdate = body.get("birthdate")
-        cpf = body.get("cpf")
-        phone_number = body.get("phone_number")
+        name = body.get("name", costumer.name)
+        birthdate = body.get("birthdate", costumer.birthdate)
+        cpf = body.get("cpf", costumer.cpf)
+        phone_number = body.get("phone_number", costumer.phone_number)
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, int) or not isinstance(phone_number, str):
+        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not isinstance(phone_number, str):
             return {"code_status":"invalid data"}, 400
         
         costumer.name = name
@@ -94,8 +94,8 @@ class CostumerMethodsScheduleId(MethodView):
 
         costumer = Costumer.query.get_or_404(id)
 
-        init_time_scheduled = body.get("init_time_scheduled")
-        final_time_scheduled = body.get("final_time_scheduled")
+        init_time_scheduled = body.get("init_time_scheduled", costumer.init_time_scheduled)
+        final_time_scheduled = body.get("final_time_scheduled", costumer.final_time_scheduled)
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
         if not isinstance(init_time_scheduled, str) or not isinstance(final_time_scheduled, str):

@@ -8,6 +8,7 @@ class Product(BaseModel):
     name = db.Column(db.String)
     quantity = db.Column(db.Float)
     description = db.Column(db.String)
+    valid_through = db.Column(db.String)
     lastModifiedByCpf = db.Column(db.String)
     
 
@@ -17,6 +18,7 @@ class Product(BaseModel):
             "name":self.name,
             "quantity":self.quantity,
             "description":self.description,
+            "valid_through":self.valid_through,
             "lastModifiedByCpf":self.lastModifiedByCpf
         }
     

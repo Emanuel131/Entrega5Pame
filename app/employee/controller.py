@@ -4,7 +4,7 @@ from app.extensions import request, MethodView
 # /employee
 class EmployeeMethods(MethodView):
 
-    # Insere info no banco de dados
+    # Cadastra novo funcionario
     def post(self):
         body = request.json
 
@@ -14,11 +14,11 @@ class EmployeeMethods(MethodView):
         phone_number = body.get("phone_number")
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, int) or not isinstance(phone_number, str):
+        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not isinstance(phone_number, str):
             return {"code_status":"invalid data"}, 400
         
         # Verifica se CPF tem tamanho valido
-        elif len(str(cpf)) < 11:
+        elif len(str(cpf)) != 11:
             return {"code_status":"invalid cpf format"}, 400
 
         # Verifica se cliente ja cadastrado
@@ -60,13 +60,13 @@ class EmployeeMethodsId(MethodView):
 
         employee = Employee.query.get_or_404(id)
 
-        name = body.get("name")
-        birthdate = body.get("birthdate")
-        cpf = body.get("cpf")
-        phone_number = body.get("phone_number")
+        name = body.get("name", employee.name)
+        birthdate = body.get("birthdate", employee.birthdate)
+        cpf = body.get("cpf", employee.cpf)
+        phone_number = body.get("phone_number", employee.phone_number)
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, int) or not isinstance(phone_number, str):
+        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not isinstance(phone_number, str):
             return {"code_status":"invalid data"}, 400
         
         employee.name = name

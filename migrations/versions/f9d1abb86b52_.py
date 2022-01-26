@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3419616d2b9d
+Revision ID: f9d1abb86b52
 Revises: 
-Create Date: 2022-01-26 12:14:16.460691
+Create Date: 2022-01-26 16:32:19.551813
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3419616d2b9d'
+revision = 'f9d1abb86b52'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('birthdate', sa.String(), nullable=True),
-    sa.Column('cpf', sa.Integer(), nullable=False),
+    sa.Column('cpf', sa.String(), nullable=False),
     sa.Column('phone_number', sa.String(), nullable=True),
     sa.Column('init_time_scheduled', sa.String(), nullable=True),
     sa.Column('final_time_scheduled', sa.String(), nullable=True),
@@ -33,7 +33,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('birthdate', sa.String(), nullable=True),
-    sa.Column('cpf', sa.Integer(), nullable=False),
+    sa.Column('cpf', sa.String(), nullable=False),
     sa.Column('phone_number', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('cpf')
@@ -43,7 +43,8 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('quantity', sa.Float(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('lastModifiedBy', sa.String(), nullable=True),
+    sa.Column('valid_through', sa.String(), nullable=True),
+    sa.Column('lastModifiedByCpf', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
