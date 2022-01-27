@@ -1,11 +1,11 @@
 from app.product.models import Product
 from app.employee.models import Employee
-from app.extensions import request, MethodView
+from app.extensions import request, MethodView, jwt_required
 
 # Autorizado cadastra/visualiza produto
 # /product/<int:id_employee>
 class ProductMethodsId(MethodView): 
-
+    decorators = [jwt_required()]
     # Cria novo produto
     def post(self, id):
         body = request.json
@@ -43,9 +43,9 @@ class ProductMethodsId(MethodView):
 
 
 # Autorizado escolhe produto especifico para mostrar/alterar/deletar
-# /product/<int:id>/<int:id>
+# /product/<int:id_employee>/<int:id_product>
 class ProductMethodsId2(MethodView):
-
+    decorators = [jwt_required()]
     # Retorna info do banco de dados de id especifico
     def get(self, id_product, id_employee):
         product = Product.query.get_or_404(id_product)

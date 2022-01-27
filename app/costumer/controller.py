@@ -1,5 +1,8 @@
+from click import decorators
+from app.extensions import request, MethodView, Message, render_template, \
+    mail, bcrypt, jwt, create_access_token, jwt_required
 from app.costumer.models import Costumer
-from app.extensions import request, MethodView
+from app.sensive import Sensive
 
 # /costumer
 class CostumerMethods(MethodView):
@@ -12,9 +15,12 @@ class CostumerMethods(MethodView):
         birthdate = body.get("birthdate")
         cpf = body.get("cpf")
         phone_number = body.get("phone_number")
+        email = body.get("email")
+        password = body.get("password")
 
         # Verifica se dado e do tipo esperado, caso seja retorna erro
-        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not isinstance(phone_number, str):
+        if not isinstance(name, str) or not isinstance(birthdate, str) or not isinstance(cpf, str) or not \
+            isinstance(phone_number, str) or not isinstance(email, str) or not isinstance(password, str):
             return {"code_status":"invalid data"}, 400
         
         # Verifica se CPF tem tamanho valido
@@ -22,13 +28,26 @@ class CostumerMethods(MethodView):
             return {"code_status":"invalid cpf format"}, 400
 
         # Verifica se cliente ja cadastrado
-        costumer = Costumer.query.filter_by(cpf=cpf).first()
-        if costumer:
+        costumer_cpf = Costumer.query.filter_by(cpf=cpf).first()
+        costumer_email = Costumer.query.filter_by(email=email).first()
+        if costumer_cpf or costumer_email:
             return {"code_status":"costumer already exists"}
 
-        # Caso nao seja, salva no banco de dados e retorna sucesso
-        costumer = Costumer(name=name, birthdate=birthdate, cpf=cpf, phone_number=phone_number)
+        # Criptografa senha
+        password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
+        # Salva cliente no banco de dados, manda email e retorna sucesso
+        costumer = Costumer(name=name, birthdate=birthdate, cpf=cpf, phone_number=phone_number, email=email, password_hash=password_hash)
         costumer.save()
+
+        msg = Message(
+            sender=Sensive.EMAIL,
+            recipients=[email],
+            subject="Bem-vindo(a) a nossa academia!",
+            html=render_template("email_costumer.html", name=name)
+        )
+        mail.send(msg)
+
         return costumer.json(), 200
 
 
@@ -46,7 +65,7 @@ class CostumerMethods(MethodView):
 
 # /costumer/<int:id>
 class CostumerMethodsId(MethodView):
-
+    decorators = [jwt_required()]
     # Retorna info do banco de dados de id especifico
     def get(self, id):
         costumer = Costumer.query.get_or_404(id)
@@ -85,9 +104,10 @@ class CostumerMethodsId(MethodView):
         return {"code_status":"deleted"}, 200
 
 
-# Cliente marcar horario:    /costumer/schedule/<int:id>
+# Cliente marcar horario
+# /costumer/schedule/<int:id>
 class CostumerMethodsScheduleId(MethodView):
-
+    decorators = [jwt_required()]
     # Altera informacoes do cliente
     def patch(self, id):
         body = request.json
@@ -106,3 +126,29 @@ class CostumerMethodsScheduleId(MethodView):
         costumer.update()
 
         return costumer.json(), 200
+
+
+# /costumer/login
+class CostumerLogin(MethodView):
+    
+    def post(self):
+        body = request.json
+
+        email = body.get("email")
+        password = body.get("password")
+
+        # Verifica se dado e do tipo esperado, caso seja retorna erro
+        if not isinstance(email, str) or not isinstance(password, str):
+            return {"code_status":"invalid data"}, 400
+        
+        costumer = Costumer.query.filter_by(email=email).first()
+
+        # Verifica se cliente existe e se senha correta
+        if not costumer or not bcrypt.checkpw(password.encode(), costumer.password_hash):
+            return {"code_status":"invalid user or password"}, 400
+        
+        # Cria token do cliente
+        token = create_access_token(identity=costumer.id)
+
+        return {"token": token}, 200
+

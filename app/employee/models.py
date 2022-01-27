@@ -9,6 +9,7 @@ class Employee(UserModel):
             "name":self.name,
             "birthdate":self.birthdate,
             "cpf":self.cpf,
-            "phone_number":self.phone_number
+            "phone_number":self.phone_number,
+            "email":self.email
         }
     

@@ -25,5 +25,7 @@ class UserModel(BaseModel):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String)
     birthdate = db.Column(db.String)
-    cpf = db.Column(db.String, nullable=False, unique=True)
+    cpf = db.Column(db.String, nullable=False, unique=True, index=True)
+    email = db.Column(db.String, nullable=False, unique=True, index=True)
+    password_hash = db.Column(db.String, nullable=False)
     phone_number = db.Column(db.String)

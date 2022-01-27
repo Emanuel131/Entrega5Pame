@@ -1,4 +1,4 @@
-from app.extensions import db, Flask, migrate
+from app.extensions import db, Flask, migrate, mail, jwt
 from app.config import Config
 
 from app.product.routes import product_api
@@ -12,6 +12,8 @@ def create_app():
 
     db.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
+    jwt.init_app(app)
 
     # Registra blueprints
     app.register_blueprint(product_api)

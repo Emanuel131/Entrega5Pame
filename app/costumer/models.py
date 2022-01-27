@@ -17,6 +17,7 @@ class Costumer(UserModel):
             "cpf":self.cpf,
             "phone_number":self.phone_number,
             "init_time_scheduled":self.init_time_scheduled,
-            "final_time_scheduled":self.final_time_scheduled
+            "final_time_scheduled":self.final_time_scheduled,
+            "email":self.email
         }
     
